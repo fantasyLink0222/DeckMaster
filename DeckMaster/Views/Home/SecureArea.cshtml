@@ -1,0 +1,36 @@
+﻿
+@model DeckMaster.Models.MyRegisteredUser
+
+@{
+    ViewData["Title"] = "Secure Area";
+}   
+
+<h2>Secure Area</h2>
+<h3>Your Details</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>User Details</h3>
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <td>@Model.ID</td>
+                </tr>
+                <tr>
+                    <th>First Name</th>
+                    <td>@Model.FirstName</td>
+                </tr>
+                <tr>
+                    <th>Last Name</th>
+                    <td>@Model.LastName</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>@Model.Email</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+

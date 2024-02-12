@@ -1,0 +1,114 @@
+﻿@model IEnumerable<DeckMaster.ViewModels.CartVM>
+
+@{
+    ViewData["Title"] = "Index";
+    
+}
+
+<h1>Index</h1>
+
+@foreach (var item in Model) {
+    <div class="product-details">
+
+        @* <img src="@Url.Content($"~/path/to/images/{item.Product.ImageName}")" alt="Product Image" /> *@
+        <p>@item.Product.Description</p>
+        <p>@item.Product.Price.ToString("C")</p>
+
+        <div class="product-cart-actions">
+            <form asp-controller="Shop" asp-action="AddToCart" method="post" class="form-inline">
+                <input type="hidden" name="productId" value="@item.Product.ID" />
+                <input type="submit" value="Add To Cart" class="btn btn-primary" />
+            </form>
+
+            <form asp-controller="Shop" asp-action="RemoveFromCart" method="post" class="form-inline">
+                <input type="hidden" name="productId" value="@item.Product.ID" />
+                <input type="submit" value="Remove from cart" class="btn btn-secondary" />
+            </form>
+       
+
+        <div class="product-cart-quantity">
+            <label>Qty:</label>
+            <span>@item.Quantity</span>
+        </div>
+
+            @{
+                decimal totalAmt = item.Quantity * item.Product.Price;
+            }
+
+        <div class="product-cart-amount">
+            <label>Amount:</label>
+                <span> @totalAmt.ToString("C")</span>
+        </div>
+        </div>
+    </div>
+}
+
+<style>
+    .product-details {
+        border: 1px solid #ccc;
+        padding: 16px;
+        margin-bottom: 20px;
+        background-color: #fff;
+        display: flex;
+    }
+
+        .product-details img {
+            width: 100%; /* Adjust as needed, or set a max-width */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .product-details p {
+            margin: 5px 0;
+        }
+
+    .product-cart-actions {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        flex-direction: column;
+    }
+
+        .product-cart-actions form {
+            margin: 0;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            opacity: 0.8;
+        }
+
+    .product-cart-quantity,
+    .product-cart-amount {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+        .product-cart-quantity label,
+        .product-cart-amount label {
+            margin-right: 5px;
+        }
+
+        .product-cart-quantity span,
+        .product-cart-amount span {
+            color: #555;
+        }
+
+
+</style>
