@@ -10,6 +10,7 @@ namespace DeckMaster.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            this.ChangeTracker.LazyLoadingEnabled = true;
         }
         public DbSet<Product> Products { get; set; }
         public DbSet<MyRegisteredUser> MyRegisteredUsers { get; set; }
@@ -18,12 +19,16 @@ namespace DeckMaster.Data
 
         public DbSet<DeckMaster.ViewModels.UserRoleVM> Decks { get; set; }
 
-        public DbSet<Cart> Cart { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<CartVM>(entity =>
+            {
+                entity.HasNoKey();
+            });
 
             modelBuilder.Entity<Product>().HasData(
                 new Product

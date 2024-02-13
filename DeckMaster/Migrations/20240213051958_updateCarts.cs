@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DeckMaster.Migrations
 {
     /// <inheritdoc />
-    public partial class addproduct : Migration
+    public partial class updateCarts : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -96,6 +96,23 @@ namespace DeckMaster.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductVM",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ProductName = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Currency = table.Column<string>(type: "TEXT", nullable: false),
+                    ImageName = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductVM", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -227,6 +244,47 @@ namespace DeckMaster.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Carts",
+                columns: table => new
+                {
+                    CartItemId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    ProductID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    CartPrice = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carts", x => x.CartItemId);
+                    table.ForeignKey(
+                        name: "FK_Carts_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CartVM",
+                columns: table => new
+                {
+                    CartItemId = table.Column<int>(type: "INTEGER", nullable: true),
+                    ProductID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.ForeignKey(
+                        name: "FK_CartVM_ProductVM_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "ProductVM",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "ID", "Currency", "Description", "ImageName", "Price", "ProductName" },
@@ -273,6 +331,16 @@ namespace DeckMaster.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Carts_ProductID",
+                table: "Carts",
+                column: "ProductID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartVM_ProductID",
+                table: "CartVM",
+                column: "ProductID");
         }
 
         /// <inheritdoc />
@@ -294,13 +362,16 @@ namespace DeckMaster.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "CartVM");
+
+            migrationBuilder.DropTable(
                 name: "Decks");
 
             migrationBuilder.DropTable(
                 name: "MyRegisteredUsers");
-
-            migrationBuilder.DropTable(
-                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "RoleVMs");
@@ -313,6 +384,12 @@ namespace DeckMaster.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "ProductVM");
         }
     }
 }

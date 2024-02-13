@@ -9,7 +9,7 @@ using DeckMaster.Models;
 
 namespace DeckMaster.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class UserRoleController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -39,9 +39,9 @@ namespace DeckMaster.Controllers
             MyRegisteredUserRepo myRegisteredUserRepo = new MyRegisteredUserRepo(_db);
             UserRoleRepo userRoleRepo = new UserRoleRepo(_userManager);
             var roles = await userRoleRepo.GetUserRolesAsync(userName);
-            var userFullName = await myRegisteredUserRepo.GetUserNameByEmailAsync(userName);
+            //var userFullName = await myRegisteredUserRepo.GetUserNameByEmailAsync(userName);
 
-            ViewBag.UserName = userFullName;
+            ViewBag.UserName = userName;
 
             return View(roles);
         }
@@ -92,6 +92,8 @@ namespace DeckMaster.Controllers
 
             //    c) Store the SelectList in a ViewBag.
             ViewBag.UserSelectList = userSelectList;
+
+
             return View();
         }
 

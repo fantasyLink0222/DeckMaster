@@ -17,6 +17,32 @@ namespace DeckMaster.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
+            modelBuilder.Entity("DeckMaster.Models.Cart", b =>
+                {
+                    b.Property<int>("CartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CartPrice")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CartItemId");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("Carts");
+                });
+
             modelBuilder.Entity("DeckMaster.Models.MyRegisteredUser", b =>
                 {
                     b.Property<int>("ID")
@@ -98,6 +124,55 @@ namespace DeckMaster.Migrations
                             Price = "7.79",
                             ProductName = "Black Deck"
                         });
+                });
+
+            modelBuilder.Entity("DeckMaster.ViewModels.CartVM", b =>
+                {
+                    b.Property<int?>("CartItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("CartVM");
+                });
+
+            modelBuilder.Entity("DeckMaster.ViewModels.ProductVM", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("ProductVM");
                 });
 
             modelBuilder.Entity("DeckMaster.ViewModels.RoleVM", b =>
@@ -337,6 +412,28 @@ namespace DeckMaster.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("DeckMaster.Models.Cart", b =>
+                {
+                    b.HasOne("DeckMaster.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("DeckMaster.ViewModels.CartVM", b =>
+                {
+                    b.HasOne("DeckMaster.ViewModels.ProductVM", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

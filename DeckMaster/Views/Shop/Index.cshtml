@@ -2,7 +2,9 @@
 
 @{
     ViewData["Title"] = "Index";
-    
+    decimal subTotalAmt = 0;
+    int ttlQty = 0;
+    string currency = "CAD";
 }
 
 <h1>Index</h1>
@@ -10,56 +12,157 @@
 @foreach (var item in Model) {
     <div class="product-details">
 
-        @* <img src="@Url.Content($"~/path/to/images/{item.Product.ImageName}")" alt="Product Image" /> *@
+        <div class="product-head">
+        <img src="@Url.Content($"~/Content/img/{item.Product.ImageName}")" alt="Product Image" />
+            <h2>@item.Product.Price.ToString("C")</h2>
+            </div>
         <p>@item.Product.Description</p>
-        <p>@item.Product.Price.ToString("C")</p>
 
-        <div class="product-cart-actions">
-            <form asp-controller="Shop" asp-action="AddToCart" method="post" class="form-inline">
-                <input type="hidden" name="productId" value="@item.Product.ID" />
-                <input type="submit" value="Add To Cart" class="btn btn-primary" />
-            </form>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="product-cart-actions">
+                <form asp-controller="Shop" asp-action="IncreaseQty" asp-route-cartId="@item.CartItemId" method="post" class="form-inline">
+                    <input type="hidden" name="productId" value="@item.Product.ID" />
+                    <input type="submit" value="Add To Cart" class="btn btn-primary" />
 
-            <form asp-controller="Shop" asp-action="RemoveFromCart" method="post" class="form-inline">
-                <input type="hidden" name="productId" value="@item.Product.ID" />
-                <input type="submit" value="Remove from cart" class="btn btn-secondary" />
-            </form>
-       
+                </form>
 
-        <div class="product-cart-quantity">
-            <label>Qty:</label>
-            <span>@item.Quantity</span>
-        </div>
+                <form asp-controller="Shop" asp-action="DecreaseQty" asp-route-cartId="@item.CartItemId" method="post" class="form-inline">
+                    <input type="hidden" name="productId" value="@item.Product.ID" />
+                    <input type="submit" value="Remove from cart" class="btn btn-secondary" />
 
-            @{
-                decimal totalAmt = item.Quantity * item.Product.Price;
-            }
+                </form>
 
-        <div class="product-cart-amount">
-            <label>Amount:</label>
-                <span> @totalAmt.ToString("C")</span>
-        </div>
-        </div>
+
+                <div class="product-cart-quantity">
+                    <label>Qty:</label>
+                    <span>@item.Quantity</span>
+                </div>
+
+                @{
+                    decimal totalAmt = item.Quantity * item.Product.Price;
+
+                    subTotalAmt += totalAmt;
+                    ttlQty += item.Quantity;
+
+                }
+
+                <div class="product-cart-amount">
+                    <label>Amount:</label>
+                    <span> @totalAmt.ToString("C")  CAD</span>
+                </div>
+
+            </div>
+
+
+        }
+      
+
     </div>
 }
+@if (User.Identity.IsAuthenticated)
+{
+    
+    <div class="product-footer">
+
+        <div id="paypal-button-container">
+        </div>
+
+        <div class="product-cart-quantity">
+            <label>Total Qty:</label>
+            <span>@ttlQty</span>
+        </div>
+
+
+
+        <div class="product-cart-amount">
+            <label>Total Amount:</label>
+            <span> @subTotalAmt.ToString("C")  CAD</span>
+        </div>
+
+    </div>
+
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AcXTWynn8CsNpXYD_HJEpH4b0AEKfDNOPSyOfHzpprT527-G5VysWgr5gqgt1mY6BHh-kXTU4KD6T9LD"></script>
+
+    <script>
+        paypal.Buttons({
+            // Set up the transaction
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: document.getElementById('subTotalAmt').value,
+                            currency:
+                                document.getElementById('currency').value
+                        }
+                    }]
+                });
+            },
+
+            // Finalize the transaction
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (details) {
+
+
+                    // Redirect to the PayPalConfirmation action method
+                    window.location.href =
+                        '/Shop/PayPalConfirmation?TransactionId=' +
+                        encodeURIComponent(details.id) + '&Amount=' +
+                        encodeURIComponent(details.purchase_units[0]
+                            .amount.value) + '&PayerName=' +
+                        encodeURIComponent(details.payer.name.given_name);
+                });
+            },
+
+
+            onCancel: function (data) {
+                alert('Transaction was cancelled.');
+            },
+            onError: function (err) {
+                alert('An error occurred during the transaction.');
+            },
+            style: {
+                layout: 'vertical', // 'vertical', 'horizontal'
+                color: 'blue',      // 'gold', 'blue', 'silver', 'black'
+                shape: 'rect',      // 'rect', 'pill'
+                label: 'paypal'     // 'checkout', 'pay', 'buynow', 'paypal'
+            }
+        }).render('#paypal-button-container');
+    </script>
+}
+
+
+
 
 <style>
     .product-details {
-        border: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        border-top: none;
+        border-left: none;
+        border-right: none;
         padding: 16px;
         margin-bottom: 20px;
         background-color: #fff;
         display: flex;
     }
+    .product-head{
+      display: flex;
+      flex-direction: column;
+      align-content: center;
+     justify-content: center;
+     text-align: center;
+     color:orangered
+    }
 
         .product-details img {
-            width: 100%; /* Adjust as needed, or set a max-width */
-            height: auto;
+            width: 200px; /* Adjust as needed, or set a max-width */
+             height: 120px;
             margin-bottom: 10px;
         }
 
         .product-details p {
-            margin: 5px 0;
+            margin: 5px 10px;
         }
 
     .product-cart-actions {
@@ -110,5 +213,15 @@
             color: #555;
         }
 
+.product-footer {
+    border-top: 1px solid #ccc;
+    padding: 16px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+ 
+}
 
 </style>
